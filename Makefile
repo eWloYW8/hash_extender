@@ -44,7 +44,7 @@ $(BIN_TEST): $(OPENSSL_INSTALL)/lib/libssl.a $(OBJS_TEST)
 	@echo [LD] $@
 	@$(CC) $(CFLAGS) -o $(BIN_TEST) $(OBJS_TEST) $(LDFLAGS)
 
-%.o: %.c
+%.o: %.c | $(OPENSSL_INSTALL)/lib/libssl.a
 	@echo [CC] $@
 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
