@@ -27,7 +27,7 @@ all: $(OPENSSL_INSTALL)/lib/libssl.a $(BINS)
 # OpenSSL build and install
 $(OPENSSL_INSTALL)/lib/libssl.a: $(OPENSSL_SRC)/Makefile
 	@echo "Building OpenSSL..."
-	@cd $(OPENSSL_SRC) && \
+	+@cd $(OPENSSL_SRC) && \
 		make && make install_sw
 
 $(OPENSSL_SRC)/Makefile:
