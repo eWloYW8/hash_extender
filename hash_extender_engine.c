@@ -1,7 +1,11 @@
-#include <arpa/inet.h>
+#ifdef _WIN32
+  #include <winsock2.h> /* For htons/htonl. */
+#else
+  #include <arpa/inet.h> /* For htons/htonl. */
+#endif
 
 #ifdef __FREEBSD__
-#include <sys/endian.h>
+  #include <sys/endian.h>
 #elif defined(__APPLE__)
   #include <libkern/OSByteOrder.h>
 
@@ -19,6 +23,39 @@
   #define htole64(x) OSSwapHostToLittleInt64(x)
   #define be64toh(x) OSSwapBigToHostInt64(x)
   #define le64toh(x) OSSwapLittleToHostInt64(x)
+#elif _WIN32
+  // for htons, htonl, etc.
+  #include <winsock2.h> 
+  // for _byteswap_uint64
+  #include <stdlib.h>   
+  // for uint64_t
+  #include <stdint.h>   
+
+  // 16-bit
+  #define htobe16(x) htons(x)
+  #define htole16(x) (x)
+  #define be16toh(x) ntohs(x)
+  #define le16toh(x) (x)
+
+  // 32-bit
+  #define htobe32(x) htonl(x)
+  #define htole32(x) (x)
+  #define be32toh(x) ntohl(x)
+  #define le32toh(x) (x)
+
+  // 64-bit (Windows doesn't define htonll/ntohll, so define manually)
+  #if defined(_MSC_VER)
+    #define htobe64(x) _byteswap_uint64(x)
+    #define be64toh(x) _byteswap_uint64(x)
+  #else
+    static uint64_t htobe64(uint64_t x) {
+        return ((uint64_t)htonl((uint32_t)(x >> 32)) |
+                ((uint64_t)htonl((uint32_t)(x & 0xFFFFFFFF)) << 32));
+    }
+#endif
+#define htole64(x) (x)
+#define le64toh(x) (x)
+
 #else
 #include <endian.h>
 #endif

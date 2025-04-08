@@ -1,7 +1,22 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#ifdef _WIN32
+#define err(eval, fmt, ...) \
+    do { fprintf(stderr, fmt ": %s\n", ##__VA_ARGS__, strerror(errno)); exit(eval); } while (0)
+
+#define errx(eval, fmt, ...) \
+    do { fprintf(stderr, fmt "\n", ##__VA_ARGS__); exit(eval); } while (0)
+
+#define warn(fmt, ...) \
+    fprintf(stderr, fmt ": %s\n", ##__VA_ARGS__, strerror(errno))
+
+#define warnx(fmt, ...) \
+    fprintf(stderr, fmt "\n", ##__VA_ARGS__)
+#else
 #include <err.h>
+#endif
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>

@@ -9,9 +9,9 @@ OS		:= $(shell uname | tr '/[[:lower:]]' '_[[:upper:]]')
 
 # These are the specifications of the toolchain
 CC		:= gcc
-CFLAGS		:= -std=c89 -g -oS -Wall -Werror -Wno-deprecated-declarations
+CFLAGS		:= -std=c99 -g -oS -Wall -Werror -Wno-deprecated-declarations
 CPPFLAGS	:= -I$(INCLUDE_OPENSSL) -D_DEFAULT_SOURCE
-LDFLAGS		:= -L$(LIB_OPENSSL) -lssl -lcrypto
+LDFLAGS		:= -L$(LIB_OPENSSL) -lssl -lcrypto $(if $(findstring MINGW,$(OS)),-lws2_32) $(if $(findstring MINGW,$(OS)),-lcrypt32)
 
 BIN_MAIN	:= hash_extender
 BIN_TEST	:= hash_extender_test
