@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h> /* For htons/htonl. */
 #else
 #include <arpa/inet.h> /* For htons/htonl. */
