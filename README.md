@@ -18,6 +18,7 @@ Now I'm gonna release the tool, and hope I didn't totally miss a good tool that 
 - SHA-256
 - SHA-512
 - WHIRLPOOL
+- SM3
 
 I'm more than happy to extend this to cover other hashing algorithms as well, provided they are "vulnerable" to this attack -- MD2, SHA-224, and SHA-384 are not. Please contact me if you have other candidates and I'll add them ASAP!
 
