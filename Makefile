@@ -36,15 +36,15 @@ $(OPENSSL_SRC)/Makefile:
 	@cd $(OPENSSL_SRC) && \
 		./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso
 
-$(BIN_MAIN): $(OBJS_MAIN) $(OPENSSL_INSTALL)/lib/libssl.a
+$(BIN_MAIN): $(OPENSSL_INSTALL)/lib/libssl.a $(OBJS_MAIN)
 	@echo [LD] $@
 	@$(CC) $(CFLAGS) -o $(BIN_MAIN) $(OBJS_MAIN) $(LDFLAGS)
 
-$(BIN_TEST): $(OBJS_TEST) $(OPENSSL_INSTALL)/lib/libssl.a
+$(BIN_TEST): $(OPENSSL_INSTALL)/lib/libssl.a $(OBJS_TEST)
 	@echo [LD] $@
 	@$(CC) $(CFLAGS) -o $(BIN_TEST) $(OBJS_TEST) $(LDFLAGS)
 
-%.o: %.c
+%.o: $(OPENSSL_INSTALL)/lib/libssl.a %.c
 	@echo [CC] $@
 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
