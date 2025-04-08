@@ -23,17 +23,14 @@
 #include <endian.h>
 #endif
 
-#include <openssl/md4.h>
-#include <openssl/md5.h>
-#include <openssl/ripemd.h>
-#include <openssl/sha.h>
-#include <openssl/sha.h>
-#include <openssl/sha.h>
-#include <openssl/sha.h>
-#include <openssl/evp.h>
+#include "openssl/md4.h"
+#include "openssl/md5.h"
+#include "openssl/ripemd.h"
+#include "openssl/sha.h"
+#include "openssl/evp.h"
 #include "tiger.h"
 #ifndef DISABLE_WHIRLPOOL
-#include <openssl/whrlpool.h>
+#include "openssl/whrlpool.h"
 #endif
 
 #include "hash_extender_engine.h"

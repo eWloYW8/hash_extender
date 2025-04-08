@@ -1,10 +1,8 @@
-# Checks if /usr/include/openssl/whrlpool.h exists, and set a define if it
-# doesn't.
-INCLUDE_OPENSSL		:= /usr/include/openssl
-INCLUDE_WHIRLPOOL	:= whrlpool.h
-ifneq ($(shell ls $(INCLUDE_OPENSSL)/$(INCLUDE_WHIRLPOOL) 2>/dev/null), $(INCLUDE_OPENSSL)/$(INCLUDE_WHIRLPOOL))
-WHIRLPOOL	:= -DDISABLE_WHIRLPOOL
-endif
+OPENSSL_SRC := $(CURDIR)/openssl
+OPENSSL_BUILD := $(OPENSSL_SRC)/build
+OPENSSL_INSTALL := $(OPENSSL_SRC)/install
+INCLUDE_OPENSSL := $(OPENSSL_INSTALL)/include
+LIB_OPENSSL := $(OPENSSL_INSTALL)/lib
 
 # Capture the operating system name for use by the preprocessor.
 OS		:= $(shell uname | tr '/[[:lower:]]' '_[[:upper:]]')
@@ -12,12 +10,8 @@ OS		:= $(shell uname | tr '/[[:lower:]]' '_[[:upper:]]')
 # These are the specifications of the toolchain
 CC		:= gcc
 CFLAGS		:= -std=c89 -g -oS -Wall -Werror -Wno-deprecated-declarations
-CPPFLAGS	:= -D_DEFAULT_SOURCE -D$(OS) $(WHIRLPOOL)
-ifeq ($(OS),DARWIN)
-    LDFLAGS		:= -lssl -lcrypto -L/usr/local/opt/openssl/lib/
-else
-    LDFLAGS		:= -lssl -lcrypto
-endif
+CPPFLAGS	:= -D_DEFAULT_SOURCE -D$(OS) -I$(INCLUDE_OPENSSL)
+LDFLAGS		:= -lssl -lcrypto -L$(LIB_OPENSSL)
 
 BIN_MAIN	:= hash_extender
 BIN_TEST	:= hash_extender_test
@@ -28,13 +22,25 @@ OBJS		:= $(patsubst %.c,%.o,$(SRCS))
 OBJS_MAIN	:= $(filter-out $(BIN_TEST).o,$(OBJS))
 OBJS_TEST	:= $(filter-out $(BIN_MAIN).o,$(OBJS))
 
-all: $(BINS)
+all: $(OPENSSL_INSTALL)/lib/libssl.a $(BINS)
 
-$(BIN_MAIN): $(OBJS_MAIN)
+# OpenSSL build and install
+$(OPENSSL_INSTALL)/lib/libssl.a: $(OPENSSL_SRC)/Makefile
+	@echo "Building OpenSSL..."
+	@cd $(OPENSSL_SRC) && \
+		make && make install_sw
+
+$(OPENSSL_SRC)/Makefile:
+	@echo "Downloading and preparing OpenSSL source..."
+	@git submodule update --init
+	@cd $(OPENSSL_SRC) && \
+		./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso
+
+$(BIN_MAIN): $(OBJS_MAIN) $(OPENSSL_INSTALL)/lib/libssl.a
 	@echo [LD] $@
 	@$(CC) $(CFLAGS) -o $(BIN_MAIN) $(OBJS_MAIN) $(LDFLAGS)
 
-$(BIN_TEST): $(OBJS_TEST)
+$(BIN_TEST): $(OBJS_TEST) $(OPENSSL_INSTALL)/lib/libssl.a
 	@echo [LD] $@
 	@$(CC) $(CFLAGS) -o $(BIN_TEST) $(OBJS_TEST) $(LDFLAGS)
 
@@ -43,9 +49,12 @@ $(BIN_TEST): $(OBJS_TEST)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 clean:
-	@echo [RM] \*.o
+	@echo [RM] *.o
 	@rm -f $(OBJS)
 	@echo [RM] $(BIN_MAIN)
 	@rm -f $(BIN_MAIN)
 	@echo [RM] $(BIN_TEST)
 	@rm -f $(BIN_TEST)
+	@echo [RM] OpenSSL build and install
+	@make -C $(OPENSSL_SRC) clean
+	@rm -rf $(OPENSSL_BUILD) $(OPENSSL_INSTALL)
