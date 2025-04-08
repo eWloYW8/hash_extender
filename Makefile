@@ -34,7 +34,7 @@ $(OPENSSL_SRC)/Makefile:
 	@echo "Downloading and preparing OpenSSL source..."
 	@git submodule update --init
 	@cd $(OPENSSL_SRC) && \
-		./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso
+		$(if $(findstring MINGW,$(OS)),/usr/bin/perl Configure mingw64 "--prefix=$(shell cygpath -m $(OPENSSL_INSTALL))" no-shared no-dso,./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso)
 
 $(BIN_MAIN): $(OPENSSL_INSTALL)/lib/libssl.a $(OBJS_MAIN)
 	@echo [LD] $@
