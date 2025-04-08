@@ -1,6 +1,6 @@
 OPENSSL_SRC := $(CURDIR)/openssl
 OPENSSL_BUILD := $(OPENSSL_SRC)/build
-OPENSSL_INSTALL := $(OPENSSL_SRC)/install
+OPENSSL_INSTALL := $(OPENSSL_SRC)/install_dir
 INCLUDE_OPENSSL := $(OPENSSL_INSTALL)/include
 LIB_OPENSSL := $(OPENSSL_INSTALL)/lib
 
@@ -58,3 +58,4 @@ clean:
 	@echo [RM] OpenSSL build and install
 	@make -C $(OPENSSL_SRC) clean
 	@rm -rf $(OPENSSL_BUILD) $(OPENSSL_INSTALL)
+	@rm $(OPENSSL_SRC)/Makefile $(OPENSSL_SRC)/configdata.pm
