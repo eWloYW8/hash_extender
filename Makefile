@@ -32,7 +32,7 @@ $(OPENSSL_INSTALL)/lib/libssl.a: $(OPENSSL_SRC)/Makefile
 
 $(OPENSSL_SRC)/Makefile:
 	@echo "Downloading and preparing OpenSSL source..."
-	@git submodule update --init
+	@git submodule update --init --depth 1 --single-branch
 	@cd $(OPENSSL_SRC) && \
 		$(if $(findstring MINGW,$(OS)),/usr/bin/perl Configure mingw64 "--prefix=$(shell cygpath -m $(OPENSSL_INSTALL))" no-shared no-dso,./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso)
 
