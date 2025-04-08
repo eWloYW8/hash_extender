@@ -1,6 +1,6 @@
 #include <arpa/inet.h>
 
-#ifdef FREEBSD
+#ifdef __FREEBSD__
 #include <sys/endian.h>
 #elif defined(__APPLE__)
   #include <libkern/OSByteOrder.h>
@@ -29,9 +29,7 @@
 #include "openssl/sha.h"
 #include "openssl/evp.h"
 #include "tiger.h"
-#ifndef DISABLE_WHIRLPOOL
 #include "openssl/whrlpool.h"
-#endif
 
 #include "hash_extender_engine.h"
 
