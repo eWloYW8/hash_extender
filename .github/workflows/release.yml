@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            artifact_name: hash_extender
+            asset_name: hash_extender-linux-x86_64
+          - os: windows
+            artifact_name: hash_extender.exe
+            asset_name: hash_extender-windows-x86_64.exe
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 1
+
+      - name: Setup for Windows cross-compilation
+        if: matrix.os == 'windows'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 gcc-mingw-w64 mingw-w64-tools
+
+      - name: Build for Linux
+        if: matrix.os == 'linux'
+        run: |
+          make
+
+      - name: Build for Windows
+        if: matrix.os == 'windows'
+        run: |
+          make CC=x86_64-w64-mingw32-gcc
+
+      - name: Rename artifact to asset_name
+        run: mv ${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: ${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: List downloaded files (debug)
+        run: ls -R
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            hash_extender-linux-x86_64/hash_extender-linux-x86_64
+            hash_extender-windows-x86_64.exe/hash_extender-windows-x86_64.exe
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

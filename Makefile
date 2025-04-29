@@ -11,7 +11,7 @@ OS		:= $(shell uname | tr '/[[:lower:]]' '_[[:upper:]]')
 CC		:= gcc
 CFLAGS		:= -std=c99 -g -oS -Wall -Werror -Wno-deprecated-declarations
 CPPFLAGS	:= -I$(INCLUDE_OPENSSL) -D_DEFAULT_SOURCE
-LDFLAGS		:= -L$(LIB_OPENSSL) -lssl -lcrypto $(if $(findstring MINGW,$(OS)),-lws2_32) $(if $(findstring MINGW,$(OS)),-lcrypt32)
+LDFLAGS		:= -L$(LIB_OPENSSL) -lssl -lcrypto $(if $(findstring mingw,$(shell $(CC) -dumpmachine)),-lws2_32) $(if $(findstring mingw,$(shell $(CC) -dumpmachine)),-lcrypt32)
 
 BIN_MAIN	:= hash_extender
 BIN_TEST	:= hash_extender_test
@@ -34,7 +34,7 @@ $(OPENSSL_SRC)/Makefile:
 	@echo "Downloading and preparing OpenSSL source..."
 	@git submodule update --init --depth 1 --single-branch
 	@cd $(OPENSSL_SRC) && \
-		$(if $(findstring MINGW,$(OS)),/usr/bin/perl Configure mingw64 "--prefix=$(shell cygpath -m $(OPENSSL_INSTALL))" no-shared no-dso,./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso)
+		$(if $(findstring mingw,$(shell $(CC) -dumpmachine)),/usr/bin/perl Configure $(if $(shell which x86_64-w64-mingw32-gcc),--cross-compile-prefix=x86_64-w64-mingw32-,) mingw64 "--prefix=$(if $(shell which cygpath),$(shell cygpath -m $(OPENSSL_INSTALL)),$(OPENSSL_INSTALL))" no-shared no-dso,./config --prefix=$(OPENSSL_INSTALL) no-shared no-dso)
 
 $(BIN_MAIN): $(OPENSSL_INSTALL)/lib/libssl.a $(OBJS_MAIN)
 	@echo [LD] $@
