@@ -1,6 +1,6 @@
 # Why Does This Repo Exist?
 
-** This repository is a fork of [iagox86/hash_extender](https://github.com/iagox86/hash_extender), which is almost out of maintenance. **
+**This repository is a fork of [iagox86/hash_extender](https://github.com/iagox86/hash_extender), which is almost out of maintenance.**
 
 I modified parts of the code and the build strategy to make it compile successfully on modern systems, and also added support for Windows.
 
